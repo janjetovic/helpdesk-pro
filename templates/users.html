@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Benutzer – HelpDesk Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Benutzerverwaltung</h1>
+</div>
+
+<div class="card">
+    <div class="card-body no-padding">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Benutzername</th>
+                    <th>E-Mail</th>
+                    <th>Rolle</th>
+                    <th>Abteilung</th>
+                    <th>Erstellt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="user-avatar-sm">{{ user.full_name[0] }}</span>
+                            <strong>{{ user.full_name }}</strong>
+                        </div>
+                    </td>
+                    <td><code>{{ user.username }}</code></td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="role-badge role-{{ user.role }}">{{ user.role | capitalize }}</span>
+                    </td>
+                    <td>{{ user.department or '–' }}</td>
+                    <td>{{ user.created_at | datetime_format }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

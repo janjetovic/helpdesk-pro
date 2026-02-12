@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  helpdesk:
+    build: .
+    container_name: helpdesk-pro
+    ports:
+      - "5000:5000"
+    environment:
+      - HELPDESK_HOST=0.0.0.0
+      - HELPDESK_PORT=5000
+      - SECRET_KEY=change-this-in-production
+    volumes:
+      - helpdesk-data:/app/instance
+    restart: unless-stopped
+
+volumes:
+  helpdesk-data:

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Neues Ticket – HelpDesk Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('ticket_list') }}" class="back-link">← Zurück zu Tickets</a>
+        <h1 class="page-title">Neues Ticket erstellen</h1>
+    </div>
+</div>
+
+<div class="form-layout">
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" class="ticket-form">
+                <div class="form-group">
+                    <label for="title">Titel *</label>
+                    <input type="text" id="title" name="title" required
+                           placeholder="Kurze Beschreibung des Problems"
+                           maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Beschreibung *</label>
+                    <textarea id="description" name="description" rows="6" required
+                              placeholder="Bitte beschreiben Sie das Problem detailliert:&#10;- Was passiert?&#10;- Seit wann besteht das Problem?&#10;- Welche Fehlermeldung erscheint?"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Kategorie</label>
+                        <select id="category" name="category">
+                            <option value="hardware">🖥️ Hardware</option>
+                            <option value="software" selected>💿 Software</option>
+                            <option value="netzwerk">🌐 Netzwerk</option>
+                            <option value="zugang">🔑 Zugang / Berechtigungen</option>
+                            <option value="sonstiges">📋 Sonstiges</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priorität</label>
+                        <select id="priority" name="priority">
+                            <option value="niedrig">🟢 Niedrig</option>
+                            <option value="mittel" selected>🟡 Mittel</option>
+                            <option value="hoch">🟠 Hoch</option>
+                            <option value="kritisch">🔴 Kritisch</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('ticket_list') }}" class="btn btn-secondary">Abbrechen</a>
+                    <button type="submit" class="btn btn-primary">Ticket erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }} – HelpDesk Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('ticket_list') }}" class="back-link">← Zurück zu Tickets</a>
+        <h1 class="page-title">#{{ ticket.id }} – {{ ticket.title }}</h1>
+    </div>
+</div>
+
+<div class="detail-layout">
+    <!-- Hauptinhalt -->
+    <div class="detail-main">
+        <!-- Ticket-Beschreibung -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Beschreibung</h3>
+                <span class="td-time">Erstellt {{ ticket.created_at | datetime_format }}</span>
+            </div>
+            <div class="card-body">
+                <div class="ticket-description">{{ ticket.description }}</div>
+                <div class="ticket-meta-row">
+                    <span>Erstellt von: <strong>{{ ticket.creator.full_name }}</strong> ({{ ticket.creator.department }})</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kommentare -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Kommentare ({{ ticket.comments | length }})</h3>
+            </div>
+            <div class="card-body">
+                {% if ticket.comments %}
+                <div class="comment-list">
+                    {% for comment in ticket.comments %}
+                    {% if not comment.is_internal or current_user.is_techniker %}
+                    <div class="comment {% if comment.is_internal %}comment-internal{% endif %}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <span class="user-avatar-sm">{{ comment.author.full_name[0] }}</span>
+                                <strong>{{ comment.author.full_name }}</strong>
+                                <span class="comment-role">{{ comment.author.role | capitalize }}</span>
+                                {% if comment.is_internal %}
+                                <span class="internal-badge">Intern</span>
+                                {% endif %}
+                            </div>
+                            <span class="comment-time">{{ comment.created_at | timeago }}</span>
+                        </div>
+                        <div class="comment-body">{{ comment.content }}</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-state">Noch keine Kommentare</p>
+                {% endif %}
+
+                <!-- Neuer Kommentar -->
+                {% if ticket.status != 'geschlossen' %}
+                <form method="POST" action="{{ url_for('ticket_comment', ticket_id=ticket.id) }}" class="comment-form">
+                    <div class="form-group">
+                        <label for="content">Kommentar hinzufügen</label>
+                        <textarea id="content" name="content" rows="3" placeholder="Nachricht schreiben..." required></textarea>
+                    </div>
+                    <div class="comment-form-actions">
+                        {% if current_user.is_techniker %}
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="is_internal">
+                            <span>Interner Kommentar (nicht sichtbar für Mitarbeiter)</span>
+                        </label>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Senden</button>
+                    </div>
+                </form>
+                {% else %}
+                <p class="empty-state">Ticket ist geschlossen – keine weiteren Kommentare möglich</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Seitenleiste -->
+    <div class="detail-sidebar">
+        <div class="card">
+            <div class="card-header">
+                <h3>Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="detail-field">
+                    <span class="detail-label">Status</span>
+                    <span class="status-badge status-{{ ticket.status }}">{{ ticket.status_label }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-label">Priorität</span>
+                    <span class="priority-badge priority-{{ ticket.priority }}">{{ ticket.priority_label }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-label">Kategorie</span>
+                    <span class="category-badge cat-{{ ticket.category }}">{{ ticket.category_label }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-label">Zugewiesen an</span>
+                    <span>{{ ticket.assignee.full_name if ticket.assignee else 'Nicht zugewiesen' }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-label">Erstellt</span>
+                    <span>{{ ticket.created_at | datetime_format }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-label">Aktualisiert</span>
+                    <span>{{ ticket.updated_at | datetime_format }}</span>
+                </div>
+                {% if ticket.closed_at %}
+                <div class="detail-field">
+                    <span class="detail-label">Geschlossen</span>
+                    <span>{{ ticket.closed_at | datetime_format }}</span>
+                </div>
+                {% endif %}
+                <div class="detail-field">
+                    <span class="detail-label">Alter</span>
+                    <span>{{ ticket.age_hours }} Stunden</span>
+                </div>
+            </div>
+        </div>
+
+        {% if current_user.is_techniker %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Ticket bearbeiten</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('ticket_update', ticket_id=ticket.id) }}">
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select name="status" id="status">
+                            {% for s in ['offen', 'in_bearbeitung', 'wartend', 'geschlossen'] %}
+                            <option value="{{ s }}" {% if ticket.status == s %}selected{% endif %}>
+                                {{ ticket.STATUS_LABELS[s] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priorität</label>
+                        <select name="priority" id="priority">
+                            {% for p in ['niedrig', 'mittel', 'hoch', 'kritisch'] %}
+                            <option value="{{ p }}" {% if ticket.priority == p %}selected{% endif %}>
+                                {{ ticket.PRIORITY_LABELS[p] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="assigned_to_id">Zuweisen an</label>
+                        <select name="assigned_to_id" id="assigned_to_id">
+                            <option value="">Nicht zugewiesen</option>
+                            {% for tech in technikers %}
+                            <option value="{{ tech.id }}" {% if ticket.assigned_to_id == tech.id %}selected{% endif %}>
+                                {{ tech.full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Aktualisieren</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

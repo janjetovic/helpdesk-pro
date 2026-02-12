@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – HelpDesk Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Willkommen, {{ current_user.full_name }}</p>
+</div>
+
+<!-- Statistik-Karten -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.offen }}</div>
+        <div class="stat-label">Offen</div>
+        <div class="stat-bar stat-bar-blue"></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.in_bearbeitung }}</div>
+        <div class="stat-label">In Bearbeitung</div>
+        <div class="stat-bar stat-bar-yellow"></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.wartend }}</div>
+        <div class="stat-label">Wartend</div>
+        <div class="stat-bar stat-bar-orange"></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.geschlossen }}</div>
+        <div class="stat-label">Geschlossen</div>
+        <div class="stat-bar stat-bar-green"></div>
+    </div>
+</div>
+
+<!-- Alarme für kritische/hohe Tickets -->
+{% if stats.kritisch > 0 or stats.hoch > 0 %}
+<div class="alert-banner">
+    ⚠️ <strong>{{ stats.kritisch + stats.hoch }}</strong> offene Tickets mit hoher/kritischer Priorität
+</div>
+{% endif %}
+
+<!-- Diagramme -->
+<div class="chart-row">
+    <div class="card">
+        <div class="card-header">
+            <h3>Tickets nach Status</h3>
+        </div>
+        <div class="card-body chart-wrapper">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3>Tickets nach Kategorie</h3>
+        </div>
+        <div class="card-body chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Letzte Tickets und zugewiesene Tickets -->
+<div class="chart-row">
+    <div class="card">
+        <div class="card-header">
+            <h3>Neueste Tickets</h3>
+            <a href="{{ url_for('ticket_list') }}" class="card-link">Alle anzeigen →</a>
+        </div>
+        <div class="card-body">
+            {% if recent_tickets %}
+            <div class="ticket-mini-list">
+                {% for ticket in recent_tickets %}
+                <a href="{{ url_for('ticket_detail', ticket_id=ticket.id) }}" class="ticket-mini">
+                    <div class="ticket-mini-left">
+                        <span class="priority-dot priority-{{ ticket.priority }}"></span>
+                        <div>
+                            <div class="ticket-mini-title">#{{ ticket.id }} {{ ticket.title }}</div>
+                            <div class="ticket-mini-meta">{{ ticket.category_label }} · {{ ticket.created_at | timeago }}</div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-{{ ticket.status }}">{{ ticket.status_label }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">Keine Tickets vorhanden</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if current_user.is_techniker %}
+    <div class="card">
+        <div class="card-header">
+            <h3>Mir zugewiesen</h3>
+        </div>
+        <div class="card-body">
+            {% if my_assigned %}
+            <div class="ticket-mini-list">
+                {% for ticket in my_assigned %}
+                <a href="{{ url_for('ticket_detail', ticket_id=ticket.id) }}" class="ticket-mini">
+                    <div class="ticket-mini-left">
+                        <span class="priority-dot priority-{{ ticket.priority }}"></span>
+                        <div>
+                            <div class="ticket-mini-title">#{{ ticket.id }} {{ ticket.title }}</div>
+                            <div class="ticket-mini-meta">{{ ticket.creator.full_name }} · {{ ticket.created_at | timeago }}</div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-{{ ticket.status }}">{{ ticket.status_label }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">Keine zugewiesenen Tickets</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const statsData = {{ stats | tojson }};
+
+    // Status-Diagramm
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Offen', 'In Bearbeitung', 'Wartend', 'Geschlossen'],
+            datasets: [{
+                data: [statsData.offen, statsData.in_bearbeitung, statsData.wartend, statsData.geschlossen],
+                backgroundColor: ['#3b82f6', '#f59e0b', '#f97316', '#10b981'],
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, font: { size: 12 } } }
+            }
+        }
+    });
+
+    // Kategorie-Diagramm
+    const cats = statsData.categories;
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Hardware', 'Software', 'Netzwerk', 'Zugang', 'Sonstiges'],
+            datasets: [{
+                data: [cats.hardware || 0, cats.software || 0, cats.netzwerk || 0, cats.zugang || 0, cats.sonstiges || 0],
+                backgroundColor: ['#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#8b5cf6'],
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

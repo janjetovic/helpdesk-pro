@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Tickets – HelpDesk Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Tickets</h1>
+    <a href="{{ url_for('ticket_new') }}" class="btn btn-primary">+ Neues Ticket</a>
+</div>
+
+<!-- Filter -->
+<div class="filter-bar">
+    <form method="GET" class="filter-form">
+        <div class="filter-group">
+            <label>Status</label>
+            <select name="status" onchange="this.form.submit()">
+                <option value="alle" {% if status_filter == 'alle' %}selected{% endif %}>Alle</option>
+                <option value="offen" {% if status_filter == 'offen' %}selected{% endif %}>Offen</option>
+                <option value="in_bearbeitung" {% if status_filter == 'in_bearbeitung' %}selected{% endif %}>In Bearbeitung</option>
+                <option value="wartend" {% if status_filter == 'wartend' %}selected{% endif %}>Wartend</option>
+                <option value="geschlossen" {% if status_filter == 'geschlossen' %}selected{% endif %}>Geschlossen</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Priorität</label>
+            <select name="priority" onchange="this.form.submit()">
+                <option value="alle" {% if priority_filter == 'alle' %}selected{% endif %}>Alle</option>
+                <option value="kritisch" {% if priority_filter == 'kritisch' %}selected{% endif %}>Kritisch</option>
+                <option value="hoch" {% if priority_filter == 'hoch' %}selected{% endif %}>Hoch</option>
+                <option value="mittel" {% if priority_filter == 'mittel' %}selected{% endif %}>Mittel</option>
+                <option value="niedrig" {% if priority_filter == 'niedrig' %}selected{% endif %}>Niedrig</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Kategorie</label>
+            <select name="category" onchange="this.form.submit()">
+                <option value="alle" {% if category_filter == 'alle' %}selected{% endif %}>Alle</option>
+                <option value="hardware" {% if category_filter == 'hardware' %}selected{% endif %}>Hardware</option>
+                <option value="software" {% if category_filter == 'software' %}selected{% endif %}>Software</option>
+                <option value="netzwerk" {% if category_filter == 'netzwerk' %}selected{% endif %}>Netzwerk</option>
+                <option value="zugang" {% if category_filter == 'zugang' %}selected{% endif %}>Zugang</option>
+                <option value="sonstiges" {% if category_filter == 'sonstiges' %}selected{% endif %}>Sonstiges</option>
+            </select>
+        </div>
+        <div class="filter-group filter-search">
+            <label>Suche</label>
+            <input type="text" name="q" value="{{ search }}" placeholder="Ticket suchen...">
+        </div>
+        <button type="submit" class="btn btn-secondary">Filtern</button>
+    </form>
+</div>
+
+<!-- Ticket-Tabelle -->
+<div class="card">
+    <div class="card-body no-padding">
+        {% if tickets %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Titel</th>
+                    <th>Kategorie</th>
+                    <th>Priorität</th>
+                    <th>Status</th>
+                    <th>Erstellt von</th>
+                    <th>Zugewiesen</th>
+                    <th>Erstellt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr class="clickable-row" onclick="window.location='{{ url_for('ticket_detail', ticket_id=ticket.id) }}'">
+                    <td class="td-id">{{ ticket.id }}</td>
+                    <td class="td-title">
+                        <span class="priority-dot priority-{{ ticket.priority }}"></span>
+                        {{ ticket.title }}
+                    </td>
+                    <td><span class="category-badge cat-{{ ticket.category }}">{{ ticket.category_label }}</span></td>
+                    <td><span class="priority-badge priority-{{ ticket.priority }}">{{ ticket.priority_label }}</span></td>
+                    <td><span class="status-badge status-{{ ticket.status }}">{{ ticket.status_label }}</span></td>
+                    <td>{{ ticket.creator.full_name }}</td>
+                    <td>{{ ticket.assignee.full_name if ticket.assignee else '–' }}</td>
+                    <td class="td-time">{{ ticket.created_at | timeago }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state-large">
+            <span class="empty-icon">🎫</span>
+            <p>Keine Tickets gefunden</p>
+            <a href="{{ url_for('ticket_new') }}" class="btn btn-primary">Erstes Ticket erstellen</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
