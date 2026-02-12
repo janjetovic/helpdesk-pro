@@ -1,4 +1,4 @@
-# 🎫 HelpDesk Pro — IT-Support-Ticketsystem
+# 🎫 HelpDesk Pro – IT-Support-Ticketsystem
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 
 **Ein vollständiges IT-Ticketsystem mit Rollenverwaltung, Dashboard und Echtzeit-Statistiken.**
 
-[Funktionen](#-funktionen) · [Installation](#-installation) · [Verwendung](#-verwendung) · [API](#-api-endpunkte) · [Technologien](#-technologien)
+[Funktionen](#-funktionen) · [Screenshots](#-screenshots) · [Installation](#-installation) · [Verwendung](#-verwendung) · [API](#-api-endpunkte) · [Technologien](#-technologien)
 
 </div>
 
@@ -18,40 +18,54 @@
 
 ## 📋 Überblick
 
-**HelpDesk Pro** ist ein webbasiertes IT-Support-Ticketsystem, das den gesamten Lebenszyklus eines Support-Tickets abbildet — von der Erstellung durch einen Mitarbeiter bis zur Lösung durch das IT-Team.
+**HelpDesk Pro** ist ein webbasiertes IT-Support-Ticketsystem, das den gesamten Lebenszyklus eines Support-Tickets abbildet – von der Erstellung durch einen Mitarbeiter bis zur Lösung durch das IT-Team.
 
 Das System umfasst eine Rollenverwaltung (Admin, Techniker, Mitarbeiter), ein Dashboard mit Statistiken, eine Kommentarfunktion und ein konfigurierbares Alarm-System für Tickets mit hoher Priorität.
 
-Dieses Projekt demonstriert praxisrelevante Konzepte der **IT-Administration** und **Anwendungsentwicklung** — relevante Kernkompetenzen für den Ausbildungsberuf **Fachinformatiker Systemintegration**.
+Dieses Projekt demonstriert praxisrelevante Konzepte der **IT-Administration** und **Anwendungsentwicklung** – relevante Kernkompetenzen für den Ausbildungsberuf **Fachinformatiker Systemintegration**.
+
+## 📸 Screenshots
+
+### Anmeldung
+![Anmeldung](screenshots/login.png)
+
+### Ticket-Übersicht
+![Tickets](screenshots/tickets.png)
+
+### Neues Ticket erstellen
+![Neues Ticket](screenshots/neues_ticket.png)
+
+### Benutzerverwaltung
+![Benutzer](screenshots/benutzer.png)
 
 ## ✨ Funktionen
 
 ### Ticket-Verwaltung
-- **Tickets erstellen** — Titel, Beschreibung, Kategorie und Priorität
-- **Status-Workflow** — Offen → In Bearbeitung → Wartend → Geschlossen
-- **Prioritäten** — Niedrig, Mittel, Hoch, Kritisch
-- **Kategorien** — Hardware, Software, Netzwerk, Zugang/Berechtigungen, Sonstiges
-- **Kommentare** — Kommunikation zwischen Mitarbeitern und Technikern
-- **Interne Notizen** — Nur für das IT-Team sichtbar
-- **Filter & Suche** — Tickets nach Status, Priorität, Kategorie filtern
+- **Tickets erstellen** – Titel, Beschreibung, Kategorie und Priorität
+- **Status-Workflow** – Offen → In Bearbeitung → Wartend → Geschlossen
+- **Prioritäten** – Niedrig, Mittel, Hoch, Kritisch
+- **Kategorien** – Hardware, Software, Netzwerk, Zugang/Berechtigungen, Sonstiges
+- **Kommentare** – Kommunikation zwischen Mitarbeitern und Technikern
+- **Interne Notizen** – Nur für das IT-Team sichtbar
+- **Filter & Suche** – Tickets nach Status, Priorität, Kategorie filtern
 
 ### Benutzerverwaltung
-- **Drei Rollen** — Admin (voller Zugriff), Techniker (Ticket-Bearbeitung), Mitarbeiter (eigene Tickets)
-- **Authentifizierung** — Session-basiertes Login mit gehashten Passwörtern
-- **Zugriffskontrolle** — Rollenbasierte Berechtigungen für alle Funktionen
+- **Drei Rollen** – Admin (voller Zugriff), Techniker (Ticket-Bearbeitung), Mitarbeiter (eigene Tickets)
+- **Authentifizierung** – Session-basiertes Login mit gehashten Passwörtern
+- **Zugriffskontrolle** – Rollenbasierte Berechtigungen für alle Funktionen
 
 ### Dashboard
-- **Statistik-Karten** — Übersicht offener, laufender und gelöster Tickets
-- **Diagramme** — Tickets nach Status und Kategorie (Chart.js)
-- **Alarm-Banner** — Warnung bei kritischen/hohen offenen Tickets
-- **Schnellzugriff** — Neueste Tickets und zugewiesene Aufgaben
+- **Statistik-Karten** – Übersicht offener, laufender und gelöster Tickets
+- **Diagramme** – Tickets nach Status und Kategorie (Chart.js)
+- **Alarm-Banner** – Warnung bei kritischen/hohen offenen Tickets
+- **Schnellzugriff** – Neueste Tickets und zugewiesene Aufgaben
 
 ### Technisch
-- **REST-API** — JSON-Endpunkte für alle Statistikdaten
-- **SQLite-Datenbank** — Keine externe Datenbank erforderlich
-- **Docker-Unterstützung** — Ein-Befehl-Deployment
-- **Unit-Tests** — 20+ automatisierte Tests
-- **Demodaten** — Vorkonfigurierte Benutzer und Beispiel-Tickets
+- **REST-API** – JSON-Endpunkte für alle Statistikdaten
+- **SQLite-Datenbank** – Keine externe Datenbank erforderlich
+- **Docker-Unterstützung** – Ein-Befehl-Deployment
+- **Unit-Tests** – 20+ automatisierte Tests
+- **Demodaten** – Vorkonfigurierte Benutzer und Beispiel-Tickets
 
 ## 🚀 Installation
 
@@ -63,7 +77,7 @@ Dieses Projekt demonstriert praxisrelevante Konzepte der **IT-Administration** u
 ### Option 1: Lokale Installation
 
 ```bash
-git clone https://github.com/DEIN-BENUTZERNAME/helpdesk-pro.git
+git clone https://github.com/janjetovic/helpdesk-pro.git
 cd helpdesk-pro
 pip install -r requirements.txt
 python run.py
@@ -151,6 +165,7 @@ helpdesk-pro/
 │   ├── ticket_form.html     # Neues Ticket erstellen
 │   ├── users.html           # Benutzerverwaltung (Admin)
 │   └── error.html           # Fehlerseite
+├── screenshots/             # Screenshots für README
 ├── tests/
 │   └── test_helpdesk.py     # Unit-Tests
 ├── Dockerfile
